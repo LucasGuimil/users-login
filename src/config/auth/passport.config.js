@@ -1,0 +1,43 @@
+import passport from "passport";
+import bcrypt from "bcrypt"
+import { Strategy as LocalStrategy } from "passport-local";
+import userModel from "../models/user.model.js";
+
+
+export function initializePassport(){
+    passport.use(new LocalStrategy(
+        {usernameField:"email",passwordField:"password",session: true}, async(email,password,done) => {
+            try {
+                console.log("entré a la estrategia")
+                const u = await userModel.findOne({email})
+                if (!u || !u.password) return done(null,false,{message: "Invalid credentials"})
+                const p = bcrypt.compareSync(password,u.password)
+                if(!p) return done(null,false,{message: "Invalid credentials"})
+                return done(null, {
+                    _id: u._id,
+                    first_name: u.first_name,
+                    last_name: u.last_name,
+                    email: u.email,
+                    age: u.age,
+                    role: u.role
+                })
+            } catch (error) {
+                return done(error)
+            }
+        }
+    ))
+
+    passport.serializeUser((u,done)=>{
+        done(null, u._id)
+    })
+    passport.deserializeUser(async(id,done)=>{
+        try {
+            const u = await userModel.findById(id)
+            if(!u) return done(null,false)
+            done(null,u)
+        } catch (error) {
+            done(error)
+        }
+    })
+}
+
