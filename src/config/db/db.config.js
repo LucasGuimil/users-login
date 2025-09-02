@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import MongoStore from "connect-mongo"
 import dotenv from "dotenv"
 dotenv.config()
 
@@ -11,3 +12,7 @@ export const dbConnection = async()=> {
     }
 }
 
+export const sessionStore = MongoStore.create({
+        mongoUrl: process.env.MONGO_ATLAS_URI,
+        ttl: 60 * 60,
+    })

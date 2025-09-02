@@ -8,7 +8,6 @@ export function initializePassport(){
     passport.use(new LocalStrategy(
         {usernameField:"email",passwordField:"password",session: true}, async(email,password,done) => {
             try {
-                console.log("entré a la estrategia")
                 const u = await userModel.findOne({email})
                 if (!u || !u.password) return done(null,false,{message: "Invalid credentials"})
                 const p = bcrypt.compareSync(password,u.password)

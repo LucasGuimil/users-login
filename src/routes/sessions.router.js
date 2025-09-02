@@ -1,13 +1,10 @@
 import { Router } from "express"
-import userModel from "../config/models/user.model.js"
-import bcrypt from "bcrypt"
-import mongoose from "mongoose"
 import passport from "passport"
-import session from "express-session"
 
-const authRouter = Router()
 
-authRouter.post("/login", async (req,res,next)=> {
+const sessionsRouter = Router()
+
+sessionsRouter.post("/login", async (req,res,next)=> {
     try{
     passport.authenticate("local",(error, u, info)=> {
         if(error) return next(error)
@@ -25,7 +22,7 @@ catch(error){
 }
 })
 
-authRouter.post("/logout", async(req,res,next)=>{
+sessionsRouter.post("/logout", async(req,res,next)=>{
     try {
         req.logOut({keepSessionInfo: true},(error)=>{
             if(error) return next(error)
@@ -41,10 +38,16 @@ authRouter.post("/logout", async(req,res,next)=>{
                 return res.json({message: "Logged out (local)"})
             }
         })
-        
     } catch (error) {
-        
+        res.status(500).json({error})       
     }
 })
 
-export default authRouter
+sessionsRouter.get("/current", async(req,res)=>{
+    try {
+        if(req.session) return res.json({payload: req.session.user})
+    } catch (error) {
+        res.status(500).json({error}) 
+    }
+})
+export default sessionsRouter
