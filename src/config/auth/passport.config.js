@@ -1,11 +1,13 @@
 import passport from "passport";
 import bcrypt from "bcrypt"
+import { configDotenv } from "dotenv";
 import { Strategy as LocalStrategy } from "passport-local";
+import { ExtractJwt, Strategy as JwtStrategy } from "passport-jwt";
 import userModel from "../models/user.model.js";
-
+configDotenv()
 
 export function initializePassport(){
-    passport.use(new LocalStrategy(
+    passport.use("local", new LocalStrategy(
         {usernameField:"email",passwordField:"password",session: true}, async(email,password,done) => {
             try {
                 const u = await userModel.findOne({email})
@@ -24,6 +26,21 @@ export function initializePassport(){
                 return done(error)
             }
         }
+    ))
+
+    passport.use("jwt",new JwtStrategy(
+            {
+                jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+                secretOrKey: process.env.JWT_SECRET
+            },async(jwt_payload,done)=>{
+                try {
+                    const user = await userModel.findById(jwt_payload.sub)
+                    if (!user) return done(null,false)
+                    return done(null, {_id: user._id, email: user.email, role: user.role} )
+                } catch (error) {
+                    return done(error,false)
+                }
+            }
     ))
 
     passport.serializeUser((u,done)=>{

@@ -2,11 +2,12 @@ import { Router } from "express"
 import userModel from "../config/models/user.model.js"
 import bcrypt from "bcrypt"
 import mongoose from "mongoose"
+import { alreadyLogged, requiredLogin } from "../middleware/auth.middleware.js"
 
 const userRouter = Router()
 
 //Get all users
-userRouter.get("/", async (req, res) => {
+userRouter.get("/",requiredLogin, async (req, res) => {
     try {
         const users = await userModel.find()
         res.send({
@@ -18,7 +19,7 @@ userRouter.get("/", async (req, res) => {
 })
 
 //Create new user
-userRouter.post("/new", async (req, res) => {
+userRouter.post("/new", alreadyLogged ,async (req, res) => {
     const { first_name, last_name, age, password, cart, email, role } = req.body
     if (!first_name || !last_name || !age || !password || !cart || !email) {
         res.status(400).json({ error: "All the information is required" })
