@@ -2,7 +2,7 @@ import { Router } from "express"
 import userModel from "../config/models/user.model.js"
 import bcrypt from "bcrypt"
 import mongoose from "mongoose"
-import { alreadyLogged, requiredLogin } from "../middleware/auth.middleware.js"
+import { alreadyLogged, requireAdmin, requiredLogin } from "../middleware/auth.middleware.js"
 
 const userRouter = Router()
 
@@ -44,8 +44,8 @@ userRouter.post("/new", alreadyLogged ,async (req, res) => {
     }
 })
 
-//Update user
-userRouter.put("/:uid", async (req, res) => {
+//Update user with admin
+userRouter.put("/:uid", requiredLogin, requireAdmin, async (req, res) => {
     try {
         if (!mongoose.Types.ObjectId.isValid(req.params.uid)) {
             return res.status(400).json({ error: "The ID is invalid." })
@@ -60,8 +60,8 @@ userRouter.put("/:uid", async (req, res) => {
     }
 })
 
-//Delete user
-userRouter.delete("/:uid", async (req, res) => {
+//Delete user with admin
+userRouter.delete("/:uid", requiredLogin, requireAdmin, async (req, res) => {
     try {
         if (!mongoose.Types.ObjectId.isValid(req.params.uid)) {
             return res.status(400).json({ error: "The ID is invalid." })

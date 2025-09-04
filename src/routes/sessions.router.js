@@ -3,7 +3,7 @@ import passport from "passport"
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 import dotenv from "dotenv"
-import { alreadyLogged, requiredLogin } from "../middleware/auth.middleware.js"
+import { alreadyLogged, requiredLogin, requireJwt } from "../middleware/auth.middleware.js"
 import userModel from "../config/models/user.model.js"
 dotenv.config()
 
@@ -54,26 +54,63 @@ sessionsRouter.post("/logout", requiredLogin, async (req, res, next) => {
 
 sessionsRouter.get("/current", requiredLogin, async (req, res) => {
     try {
-        if (req.session) return res.json({ payload: req.session.user })
+        if (req.session) return res.json({
+            payload: {
+                id: req.session.user._id,
+                first_name: req.session.user.first_name,
+                last_name: req.session.user.last_name,
+                role: req.session.user.role,
+                token: req.session.token
+            }
+        })
     } catch (error) {
         res.status(500).json({ error })
     }
 })
 
 // JWT strategies
-sessionsRouter.post("/jwt/login", async (req, res) => {
+sessionsRouter.post("/jwt/login", alreadyLogged, async (req, res) => {
     if (!req.body.email || !req.body.password) return res.status(400).json({ error: "All the information is required" })
     const u = await userModel.findOne({ email: req.body.email })
     if (!u) return res.status(404).json({ error: "User not found" })
     const p = bcrypt.compareSync(req.body.password, u.password)
     if (!p) return res.status(401).json({ error: "Invalid credentials" })
     try {
-        const jwt_payload = { sub: String(u._id), email: u.email, role: u.role }
-        const token = jwt.sign(jwt_payload, process.env.JWT_SECRET, { expiresIn: "1h" })
-        res.json({ message: "Login succesfull (JWT)", token })
+        const payload = { sub: String(u._id), email: u.email, role: u.role }
+        const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "1h" })
+        req.logIn(u, { session: true }, (error) => {
+            if (error) return res.send(error)
+            req.session.user = u
+            res.json({ message: "Login succesfull (JWT)", token, payload })
+        })
     } catch (error) {
         res.status(500).json({ error })
     }
 })
 
+sessionsRouter.get("/jwt/me", requiredLogin, requireJwt, async (req, res) => {
+    try {
+        res.json({
+            payload: {
+                id: req.user._id,
+                first_name: req.user.first_name,
+                role: req.user.role
+            }
+        })
+    } catch (error) {
+        res.status(500).json({ error })
+    }
+})
+
+sessionsRouter.put("/jwt/me",requiredLogin,requireJwt, async(req,res)=>{
+    try {
+        if(!req.body) return res.status(400).json({error: "Missing information to update"})
+        const u = await userModel.findByIdAndUpdate(req.session.user._id,req.body, {new: true, runValidators: true})
+        if (!u) return res.status(400).json({ error: "User not found." })
+        req.session.user = u
+        res.json({message: "Your information has been updated!"})
+    } catch (error) {
+        res.status(500).json({ error })
+    }
+})
 export default sessionsRouter

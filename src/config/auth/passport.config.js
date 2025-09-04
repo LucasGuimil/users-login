@@ -31,12 +31,12 @@ export function initializePassport(){
     passport.use("jwt",new JwtStrategy(
             {
                 jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-                secretOrKey: process.env.JWT_SECRET
-            },async(jwt_payload,done)=>{
+                secretOrKey: process.env.JWT_SECRET,
+            },async(payload,done)=>{
                 try {
-                    const user = await userModel.findById(jwt_payload.sub)
+                    const user = await userModel.findById(payload.sub)
                     if (!user) return done(null,false)
-                    return done(null, {_id: user._id, email: user.email, role: user.role} )
+                    return done(null, user)
                 } catch (error) {
                     return done(error,false)
                 }

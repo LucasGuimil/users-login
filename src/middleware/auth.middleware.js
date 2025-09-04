@@ -10,3 +10,9 @@ export function alreadyLogged(req,res,next) {
     next()
 }
 
+export const requireJwt = passport.authenticate("jwt",{session: false})
+
+export function requireAdmin(req,res,next) {
+    if(req.session.user.role != "admin") return res.status(403).json({error: "This operation requires an admin role."})
+    next()
+}
