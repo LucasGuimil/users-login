@@ -52,15 +52,15 @@ sessionsRouter.post("/logout", requiredLogin, async (req, res, next) => {
     }
 })
 
-sessionsRouter.get("/current", requiredLogin, async (req, res) => {
+sessionsRouter.get("/current", requiredLogin, requireJwt, async (req, res) => {
     try {
-        if (req.session) return res.json({
+        if (req.user) return res.json({
             payload: {
-                id: req.session.user._id,
-                first_name: req.session.user.first_name,
-                last_name: req.session.user.last_name,
-                role: req.session.user.role,
-                token: req.session.token
+                id: req.user._id,
+                first_name: req.user.first_name,
+                last_name: req.user.last_name,
+                role: req.user.role,
+                token: req.token
             }
         })
     } catch (error) {
