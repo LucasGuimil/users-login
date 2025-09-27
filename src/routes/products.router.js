@@ -6,7 +6,7 @@ import { productsController } from "../app/controllers/products.controller.js";
 const productsRouter = Router()
 productsRouter.use(requiredLogin)
 
-productsRouter.get("/", (req,res)=>{ productsController.getAll(req,res)})
-productsRouter.post("/",requireAdmin, (req,res)=>{ productsController.newProduct(req,res)})
+productsRouter.get("/", (req, res) => { productsController.getAll(req, res) })
+productsRouter.post("/", requireAdmin, (req, res) => { productsController.newProduct(req, res) })
 
 export default productsRouter
