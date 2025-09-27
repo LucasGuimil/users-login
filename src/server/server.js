@@ -7,6 +7,7 @@ import { dbConnection, sessionStore } from "../config/db/db.config.js"
 import { initializePassport } from "../config/auth/passport.config.js"
 import userRouter from "../routes/user.router.js"
 import sessionsRouter from "../routes/sessions.router.js"
+import productsRouter from "../routes/products.router.js"
 
 dotenv.config()
 
@@ -39,6 +40,7 @@ export const startServer = async () => {
     
     app.use("/api/users", userRouter)
     app.use("/api/sessions", sessionsRouter)
+    app.use("/api/products",productsRouter)
 
 
     app.listen(PORT, console.log(`Listening on port ${PORT}.`))

@@ -3,5 +3,5 @@ import productModel from "../../config/models/product.model.js";
 
 export class ProductsMongoDAO extends BaseDAO {
     constructor(){super(productModel)}
-
+    
 }

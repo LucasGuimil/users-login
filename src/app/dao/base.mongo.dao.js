@@ -10,7 +10,7 @@ export class BaseDAO {
         if (options.limit) query.sort(options.limit)
         if (options.skip) query.sort(options.skip)
         if (options.select) query.sort(options.select)
-        return await q
+        return await query
     }
     async updateById(id, data) {return await this.model.findByIdAndUpdate(id,data, {new: true , runValidators: true})}
     async deleteById(id) { return await this.model.findByIdAndDelete(id)}
