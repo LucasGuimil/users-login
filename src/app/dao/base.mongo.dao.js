@@ -7,9 +7,8 @@ export class BaseDAO {
     async getAll(filter = {}, options = {}) {
         const query = this.model.find(filter)
         if (options.sort) query.sort(options.sort)
-        if (options.limit) query.sort(options.limit)
-        if (options.skip) query.sort(options.skip)
-        if (options.select) query.sort(options.select)
+        if (options.limit) query.limit(options.limit)
+        if (options.skip) query.skip(options.skip)
         return await query
     }
     async updateById(id, data) {return await this.model.findByIdAndUpdate(id,data, {new: true , runValidators: true})}

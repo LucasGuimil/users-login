@@ -102,13 +102,13 @@ sessionsRouter.get("/jwt/me", requiredLogin, requireJwt, async (req, res) => {
     }
 })
 
-sessionsRouter.put("/jwt/me",requiredLogin,requireJwt, async(req,res)=>{
+sessionsRouter.put("/jwt/me", requiredLogin, requireJwt, async (req, res) => {
     try {
-        if(!req.body) return res.status(400).json({error: "Missing information to update"})
-        const u = await userModel.findByIdAndUpdate(req.session.user._id,req.body, {new: true, runValidators: true})
+        if (!req.body) return res.status(400).json({ error: "Missing information to update" })
+        const u = await userModel.findByIdAndUpdate(req.session.user._id, req.body, { new: true, runValidators: true })
         if (!u) return res.status(400).json({ error: "User not found." })
         req.session.user = u
-        res.json({message: "Your information has been updated!"})
+        res.json({ message: "Your information has been updated!" })
     } catch (error) {
         res.status(500).json({ error })
     }
