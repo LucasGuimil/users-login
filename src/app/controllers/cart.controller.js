@@ -93,6 +93,7 @@ class CartController {
     async delete(req, res) {
         try {
             await cartService.deleteById(req.params.cid)
+            await userModel.findByIdAndUpdate(req.user._id,{cart: null})
             return res.status(204).json()
         } catch (error) { res.status(500).send(error) }
     }

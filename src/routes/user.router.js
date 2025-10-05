@@ -20,8 +20,8 @@ userRouter.get("/",requiredLogin, async (req, res) => {
 
 //Create new user
 userRouter.post("/new", alreadyLogged ,async (req, res) => {
-    const { first_name, last_name, age, password, cart, email, role } = req.body
-    if (!first_name || !last_name || !age || !password || !cart || !email) {
+    const { first_name, last_name, age, password, email, role } = req.body
+    if (!first_name || !last_name || !age || !password || !email) {
         res.status(400).json({ error: "All the information is required" })
     }
     const exists = await userModel.findOne({ email })
