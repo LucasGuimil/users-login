@@ -60,7 +60,8 @@ sessionsRouter.get("/current", requiredLogin, requireJwt, async (req, res) => {
                 first_name: req.user.first_name,
                 last_name: req.user.last_name,
                 role: req.user.role,
-                token: req.token
+                token: req.token,
+                cart: req.user.cart
             }
         })
     } catch (error) {
@@ -94,9 +95,11 @@ sessionsRouter.get("/jwt/me", requiredLogin, requireJwt, async (req, res) => {
             payload: {
                 id: req.user._id,
                 first_name: req.user.first_name,
-                role: req.user.role
+                role: req.user.role,
+                cart: req.user.cart
             }
         })
+        
     } catch (error) {
         res.status(500).json({ error })
     }
