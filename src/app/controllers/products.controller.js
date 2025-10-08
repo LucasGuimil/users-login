@@ -1,4 +1,3 @@
-import mongoose from "mongoose";
 import { toCreateProductDTO, toUpdateProductDTO } from "../dto/product.dto.js";
 import { productsService as svc } from "../services/products.service.js";
 

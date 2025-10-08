@@ -10,5 +10,8 @@ export function validateId(req, res, next) {
     if (req.params.pid) {
         if (!mongoose.Types.ObjectId.isValid(req.params.pid)) { return res.status(400).json({ error: "The ID is invalid." }) }
     }
+    if (req.params.uid) {
+        if (!mongoose.Types.ObjectId.isValid(req.params.uid)) { return res.status(400).json({ error: "The ID is invalid." }) }
+    }
     next()
 }
