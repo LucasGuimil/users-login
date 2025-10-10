@@ -6,7 +6,7 @@ import passport from "passport"
 import { dbConnection, sessionStore } from "../config/db/db.config.js"
 import { initializePassport } from "../config/auth/passport.config.js"
 import userRouter from "../routes/user.router.js"
-import sessionsRouter from "../routes/sessions.router.js"
+import authRouter from "../routes/auth.router.js"
 import productsRouter from "../routes/products.router.js"
 import cartsRouter from "../routes/cart.router.js"
 
@@ -40,7 +40,7 @@ export const startServer = async () => {
     app.use(passport.session())
     
     app.use("/api/users", userRouter)
-    app.use("/api/sessions", sessionsRouter)
+    app.use("/api/auth", authRouter)
     app.use("/api/products",productsRouter)
     app.use("/api/carts",cartsRouter)
 
