@@ -26,7 +26,7 @@ class AuthController {
     }
     async current(req,res){
         try {
-            const u = await authService.current(req.user,req.path)
+            const u = await authService.current(req.session.user,req.path)
             return res.status(200).send(u)
         } catch (error) {
             res.status(500).json({error})

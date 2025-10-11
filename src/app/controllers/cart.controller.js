@@ -1,14 +1,14 @@
 import { cartService } from "../services/cart.service.js";
 import { productsService } from "../services/products.service.js";
-import userModel from "../../config/models/user.model.js";
+import { userService } from "../services/user.service.js";
 
 class CartController {
     async create(req, res) {
         try {
-            if (req.user.cart) { return res.status(400).json({ message: `Cart already exists with ID: ${req.user.cart._id}` }) }
+            if (req.session.user.cart) { return res.status(400).json({ message: `Cart already exists with ID: ${req.session.user.cart}` }) }
             const c = await cartService.create()
-            await userModel.findByIdAndUpdate(req.session.user._id, { cart: c })
-            req.session.user.cart = req.user.cart
+            await userService.updateById(req.session.user._id, { cart: c._id })
+            req.session.user.cart = c._id
             res.status(201).send(`New cart created succesfully! Your ID cart is: ${c._id}`)
         } catch (error) {
             res.status(500).send(error)
@@ -83,7 +83,6 @@ class CartController {
             const myCart = await cartService.getById(req.params.cid)
             const p = myCart.products.findIndex(product => String(product.productID) === req.params.pid)
             if (p==-1) { return res.status(400).send("Product is not in cart.") }
-            console.log(p)
             myCart.products.splice(p, 1)
             await cartService.updateById(req.params.cid, myCart)
             res.status(200).send("Product deleted!")
@@ -92,8 +91,11 @@ class CartController {
 
     async delete(req, res) {
         try {
-            await cartService.deleteById(req.params.cid)
-            await userModel.findByIdAndUpdate(req.user._id,{cart: null})
+            const u = await userService.updateById(req.session.user._id,{cart: null})
+            if(u.cart== null) {
+                await cartService.deleteById(req.params.cid)
+                req.session.user.cart = null
+            }
             return res.status(204).json()
         } catch (error) { res.status(500).send(error) }
     }

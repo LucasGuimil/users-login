@@ -31,13 +31,12 @@ export const startServer = async () => {
         cookie: {
             maxAge: 1 * 60 * 60 * 1000,
             httpOnly: true,
-            /*             signed: true */
         }
     })
     )
     initializePassport()
     app.use(passport.initialize())
-    app.use(passport.session())
+    app.use(passport.session({pauseStream: true}))
     
     app.use("/api/users", userRouter)
     app.use("/api/auth", authRouter)

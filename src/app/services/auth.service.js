@@ -14,22 +14,20 @@ class AuthService {
     async login(req, u) {
         const payload = { sub: String(u._id), email: u.email, role: u.role }
         const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "1h" })
-        req.logIn(u, { session: true }, (error) => {
-            if (error) return (error)
-        })
         return token
     }
     async logout(req) {
-        req.logOut({ keepSessionInfo: true }, (error) => {
-            if (error) return (error)
+        return new Promise((resolve,reject)=>{
+            req.logOut( { keepSessionInfo: true }, (error) => {
+            if (error) return reject(error)
             if (req.session) {
                 req.session.destroy((error2) => {
-                    if (error2) return next(error2)
-                    return
+                    if (error2) return reject(error2)
+                    resolve()
                 })
             }
-            return
-        })
+            resolve()
+        })})
     }
     async current(user,param){
         const dto = toShowInfoDTO(user,param)
