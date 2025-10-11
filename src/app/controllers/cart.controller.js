@@ -17,7 +17,7 @@ class CartController {
 
     async get(req, res) {
         try {
-            const c = await cartService.getById(req.params.cid)
+            const c = await cartService.get(req.params.cid)
             if (!c) return res.status(404).json({ message: "Cart not found" })
             res.json({ mycart: c })
         } catch (error) {
